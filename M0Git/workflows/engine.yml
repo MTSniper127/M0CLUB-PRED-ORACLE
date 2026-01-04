@@ -170,4 +170,105 @@ jobs:
         run: |
           set -euo pipefail
           # Build only engine-related bins if present; fall back to workspace build.
-          if cargo metadata --no-deps --format-version 1 | jq
+          if cargo metadata --no-deps --format-version 1 | jq -e '.packages[] | select(.name=="m0d")' >/dev/null 2>&1; then
+            cargo build -p m0d --release
+          else
+            cargo build --workspace --release
+          fi
+
+      - name: Smoke run (daemon help)
+        run: |
+          set -euo pipefail
+          # Try to run a help command for the engine daemon if it exists.
+          if [ -f "target/release/m0d" ]; then
+            ./target/release/m0d --help >/dev/null
+            echo "m0d help OK"
+          else
+            echo "No m0d binary found. Ensure core-engine/bin/m0d exists or adjust workflow."
+          fi
+
+      - name: Smoke run (ingestor help)
+        run: |
+          set -euo pipefail
+          if [ -f "target/release/m0-ingestd" ]; then
+            ./target/release/m0-ingestd --help >/dev/null
+            echo "m0-ingestd help OK"
+          else
+            echo "No m0-ingestd binary found. Skipping."
+          fi
+
+      - name: Stop local validator
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ -f /tmp/validator.pid ]; then
+            kill "$(cat /tmp/validator.pid)" || true
+          fi
+
+  artifacts:
+    name: Publish build artifacts (optional)
+    runs-on: ubuntu-latest
+    needs: [rust-core]
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            . -> target
+
+      - name: Build release
+        run: |
+          set -euo pipefail
+          cargo build --workspace --release
+
+      - name: Collect binaries
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/bin
+          for b in m0d m0-ingestd m0-backtestd m0-signer-agent; do
+            if [ -f "target/release/$b" ]; then
+              cp "target/release/$b" artifacts/bin/
+            fi
+          done
+          ls -la artifacts/bin || true
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine-binaries
+          path: artifacts/bin
+          if-no-files-found: ignore
+          retention-days: 14
+
+  security:
+    name: Dependency security (OSV)
+    runs-on: ubuntu-latest
+    needs: rust-core
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: OSV-Scanner
+        uses: google/osv-scanner-action@v1.7.3
+        with:
+          scan-args: |-
+            --recursive
+            --skip-git
+            .
+
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: osv-results.sarif
+          category: osv
