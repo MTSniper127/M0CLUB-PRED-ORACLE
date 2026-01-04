@@ -1,0 +1,44 @@
+
+[workspace]
+resolver = "2"
+members = [
+  "crates/m0-common",
+  "crates/m0-ingestor",
+  "crates/m0-normalizer",
+  "crates/m0-feature-store",
+  "crates/m0-quant",
+  "crates/m0-anomaly",
+  "crates/m0-backtest",
+  "crates/m0-bundle",
+  "crates/m0-signer",
+  "crates/m0-core",
+  "bin/m0d",
+  "bin/m0-ingestd",
+  "bin/m0-backtestd",
+  "bin/m0-signer-agent",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[workspace.dependencies]
+anyhow = "1.0"
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+uuid = { version = "1.7", features = ["v4", "serde"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "json"] }
+tokio = { version = "1.36", features = ["rt-multi-thread", "macros", "time", "signal"] }
+clap = { version = "4.5", features = ["derive"] }
+sha2 = "0.10"
+hex = "0.4"
+rand = "0.8"
+bytes = "1.6"
+prost = "0.12"
+prost-types = "0.12"
+async-trait = "0.1"
