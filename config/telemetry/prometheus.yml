@@ -1,0 +1,33 @@
+
+# Prometheus scrape config for M0Club.
+# Deploy as a ConfigMap to Prometheus, or merge with your stack.
+
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+
+scrape_configs:
+  - job_name: "m0-engine"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets:
+          - "m0-ingestor:9100"
+          - "m0-aggregator:9100"
+          - "m0-quant:9100"
+          - "m0-submitter:9100"
+          - "m0-reconciler:9100"
+
+  - job_name: "m0-api"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets:
+          - "m0-api-gateway:9100"
+          - "m0-realtime:9100"
+
+  - job_name: "m0-signer"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets:
+          - "m0-signer-agent-0:9100"
+          - "m0-signer-agent-1:9100"
+          - "m0-signer-agent-2:9100"

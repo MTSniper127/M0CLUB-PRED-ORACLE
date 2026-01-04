@@ -1,0 +1,33 @@
+
+# Market registry: sports (example catalog)
+# Sports markets generally update frequently and can be tiered as FAST/NORMAL.
+
+[[market]]
+market_id = "NBA_LAL_BOS"
+domain = "sports"
+tier_policy = "FAST"
+cadence_ms = 1500
+active = true
+outcomes = ["HOME_WIN", "AWAY_WIN"]
+description = "NBA: Los Angeles vs Boston match winner."
+tags = ["nba"]
+
+[[market]]
+market_id = "EPL_ARS_MCI"
+domain = "sports"
+tier_policy = "FAST"
+cadence_ms = 2000
+active = true
+outcomes = ["HOME_WIN", "DRAW", "AWAY_WIN"]
+description = "EPL: Arsenal vs Man City match result."
+tags = ["football", "epl"]
+
+[[market]]
+market_id = "UCL_FINAL_WINNER"
+domain = "sports"
+tier_policy = "NORMAL"
+cadence_ms = 5000
+active = true
+outcomes = ["TEAM_A", "TEAM_B"]
+description = "UEFA Champions League final winner."
+tags = ["football", "ucl"]

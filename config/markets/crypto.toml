@@ -1,0 +1,32 @@
+
+# Market registry: crypto (example catalog)
+
+[[market]]
+market_id = "CRYPTO_BTC_RANGE_24H"
+domain = "crypto"
+tier_policy = "FAST"
+cadence_ms = 1000
+active = true
+outcomes = ["UP", "FLAT", "DOWN"]
+description = "BTC direction over 24h window."
+tags = ["btc"]
+
+[[market]]
+market_id = "CRYPTO_ETH_RANGE_24H"
+domain = "crypto"
+tier_policy = "FAST"
+cadence_ms = 1000
+active = true
+outcomes = ["UP", "FLAT", "DOWN"]
+description = "ETH direction over 24h window."
+tags = ["eth"]
+
+[[market]]
+market_id = "CRYPTO_SOL_VOL_7D"
+domain = "crypto"
+tier_policy = "NORMAL"
+cadence_ms = 2000
+active = true
+outcomes = ["HIGH", "MED", "LOW"]
+description = "SOL realized volatility bucket over 7d."
+tags = ["sol"]

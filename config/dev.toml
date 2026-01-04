@@ -1,0 +1,124 @@
+
+# M0Club environment config: dev
+# This file is intended to run on localnet/devnet with minimal security constraints.
+# Never use dev settings in production.
+
+[env]
+name = "dev"
+region = "local"
+log_level = "debug"
+
+[solana]
+cluster = "localnet"
+rpc_url = "http://127.0.0.1:8899"
+ws_url = "ws://127.0.0.1:8900"
+commitment = "confirmed"
+timeout_ms = 15000
+max_retries = 5
+
+[programs]
+registry_program_id = "M0Reg1stry11111111111111111111111111111111"
+oracle_program_id   = "M0Orac1e111111111111111111111111111111111"
+vault_program_id    = "M0Vaul7t111111111111111111111111111111111"
+
+[accounts]
+# Dev keys should be generated locally. Do not commit keys to git.
+fee_payer_keypair_path = "infrastructure/dev-keys/fee-payer.json"
+submitter_keypair_path = "infrastructure/dev-keys/submitter.json"
+
+[storage]
+postgres_url = "postgres://m0:m0@127.0.0.1:5432/m0"
+redis_url    = "redis://127.0.0.1:6379/0"
+clickhouse_url = "http://127.0.0.1:8123"
+object_store = "localfs"
+object_store_root = "./.m0data"
+
+[eventlog]
+driver = "nats"
+url = "nats://127.0.0.1:4222"
+subject_prefix = "m0.dev"
+durable_consumer = "m0-dev"
+max_inflight = 4096
+
+[engine]
+profile = "local"
+tick_interval_ms = 250
+max_concurrent_markets = 64
+max_inflight_events = 200000
+feature_window_seconds = 1800
+bundle_max_markets = 32
+
+[engine.connectors]
+# Connector toggles; set false to disable a connector.
+onchain_enabled   = true
+sports_enabled    = true
+politics_enabled  = true
+macro_enabled     = true
+crypto_enabled    = true
+
+[engine.normalization]
+strict_schema = true
+drop_unknown_fields = false
+default_timezone = "UTC"
+max_clock_skew_ms = 30000
+
+[engine.models]
+model_family = "bayes_v1"
+calibration_enabled = true
+calibration_artifact_path = "artifacts/calibration/dev/calibration.json"
+prior_strength = 1.0
+min_observations = 8
+max_features = 256
+
+[engine.guardrails]
+policy_level = "NORMAL" # FAST | NORMAL | STRICT
+max_jump_bps = 1500
+max_ci_width_bps = 7000
+min_source_coverage_ratio = 0.60
+max_staleness_ms = 120000
+block_on_divergence = true
+block_on_ci_invalid = true
+
+[publish]
+enabled = true
+mode = "commit_reveal"
+commit_reveal = true
+cadence_ms = 1000
+concurrency = 2
+compute_unit_limit = 1400000
+priority_fee_micro_lamports = 1000
+reveal_delay_ms = 800
+max_reveal_retries = 12
+idempotency_store = "postgres"
+
+[signers]
+active_signer_set_id = 1
+threshold = 2
+# For dev only: file-based keys
+key_source = "file" # file | kms
+signer_agent_endpoints = [
+  "http://127.0.0.1:9101",
+  "http://127.0.0.1:9102",
+  "http://127.0.0.1:9103",
+]
+request_timeout_ms = 2500
+
+[api]
+http_bind = "0.0.0.0:8080"
+ws_bind   = "0.0.0.0:8090"
+cors_allowed_origins = ["*"]
+max_request_body_bytes = 5242880
+rate_limit_rps = 50
+rate_limit_burst = 200
+
+[security]
+require_tls = false
+mTLS_enabled = false
+jwt_enabled = false
+admin_api_enabled = true
+admin_token = "dev-admin-token-change-me"
+
+[paths]
+markets_config_dir = "config/markets"
+risk_config_dir    = "config/risk"
+telemetry_dir      = "config/telemetry"

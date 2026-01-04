@@ -1,0 +1,30 @@
+
+# Slashing parameters (if stake-based signer incentives are enabled).
+# If your v1 does not implement slashing on-chain, keep enabled=false.
+
+[slashing]
+enabled = false
+program_id = "M0Slash1111111111111111111111111111111111"
+
+# epoch-based slashing evaluation interval
+evaluation_interval_epochs = 120
+
+# minimum evidence threshold to slash
+min_evidence_level = 3
+
+# penalty fractions in basis points (of signer stake)
+penalty_minor_bps = 25
+penalty_major_bps = 150
+penalty_critical_bps = 500
+
+# grace period after rotation before slashing starts for a new set
+grace_epochs_after_activation = 10
+
+# dispute window for a slash event
+dispute_window_epochs = 30
+
+[conditions]
+# examples of slashable conditions
+invalid_signature = { enabled = true, severity = "critical" }
+consistent_threshold_miss = { enabled = true, severity = "major", miss_rate_threshold = 0.10, window_epochs = 20 }
+uptime_below_slo = { enabled = true, severity = "minor", uptime_threshold = 0.98, window_epochs = 60 }

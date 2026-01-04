@@ -1,0 +1,33 @@
+
+# Market registry: politics (example catalog)
+# Add or remove markets based on your coverage plan.
+
+[[market]]
+market_id = "POL_US_PRES_2028"
+domain = "politics"
+tier_policy = "STRICT"
+cadence_ms = 5000
+active = true
+outcomes = ["DEM_WIN", "REP_WIN", "OTHER"]
+description = "US Presidential election winner (2028)."
+tags = ["election", "us"]
+
+[[market]]
+market_id = "POL_UK_GE_NEXT"
+domain = "politics"
+tier_policy = "STRICT"
+cadence_ms = 8000
+active = true
+outcomes = ["LAB_WIN", "CON_WIN", "OTHER"]
+description = "UK general election winner (next)."
+tags = ["election", "uk"]
+
+[[market]]
+market_id = "POL_EU_COMMISSION_VOTE"
+domain = "politics"
+tier_policy = "NORMAL"
+cadence_ms = 12000
+active = false
+outcomes = ["PASS", "FAIL"]
+description = "EU commission motion outcome."
+tags = ["eu"]

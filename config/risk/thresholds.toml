@@ -1,0 +1,44 @@
+
+# Risk thresholds used by guardrails and consumer policies.
+
+[scales]
+prob_scale = 1000000000
+risk_scale = 10000
+
+[global]
+# Max staleness for outputs, after which publishing is blocked or degraded.
+max_staleness_ms = 60000
+
+# Minimum acceptable source coverage ratio for publishing.
+min_source_coverage_ratio = 0.80
+
+# Max probability jump between consecutive ticks (basis points of 1.0).
+max_jump_bps = 800
+
+# Maximum width of confidence interval (basis points of 1.0).
+max_ci_width_bps = 5500
+
+# Risk score policy
+max_risk_score_for_strict_publish = 2500
+max_risk_score_for_normal_publish = 4000
+max_risk_score_for_fast_publish   = 6000
+
+[domain.sports]
+min_source_coverage_ratio = 0.75
+max_staleness_ms = 45000
+max_jump_bps = 1200
+
+[domain.politics]
+min_source_coverage_ratio = 0.85
+max_staleness_ms = 120000
+max_jump_bps = 600
+
+[domain.macro]
+min_source_coverage_ratio = 0.90
+max_staleness_ms = 180000
+max_jump_bps = 500
+
+[domain.crypto]
+min_source_coverage_ratio = 0.80
+max_staleness_ms = 30000
+max_jump_bps = 1500

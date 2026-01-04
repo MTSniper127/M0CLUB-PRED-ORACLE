@@ -1,0 +1,38 @@
+
+# OpenTelemetry config for M0Club services.
+# Services should load this file when OTEL is enabled.
+
+[service]
+name = "m0club"
+namespace = "m0"
+environment = "dev"
+
+[exporters.otlp]
+enabled = true
+endpoint = "http://otel-collector:4317"
+protocol = "grpc"
+timeout_ms = 10000
+
+[exporters.otlp.headers]
+# Use secret injection for real keys.
+# "authorization" = "Bearer ..."
+
+[traces]
+enabled = true
+sampler = "parentbased_traceidratio"
+sample_ratio = 0.10
+
+[metrics]
+enabled = true
+export_interval_ms = 10000
+
+[logs]
+enabled = true
+include_trace_context = true
+
+[resource]
+# Extra resource attributes
+attrs = [
+  "service.version=0.1.0",
+  "deployment.environment=dev"
+]

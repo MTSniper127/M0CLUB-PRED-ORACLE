@@ -1,0 +1,32 @@
+
+# Market registry: macro (example catalog)
+
+[[market]]
+market_id = "MACRO_US_CPI_YOY_NEXT"
+domain = "macro"
+tier_policy = "STRICT"
+cadence_ms = 15000
+active = true
+outcomes = ["ABOVE_FORECAST", "IN_LINE", "BELOW_FORECAST"]
+description = "US CPI YoY vs consensus at next print."
+tags = ["cpi", "us"]
+
+[[market]]
+market_id = "MACRO_FED_NEXT_MOVE"
+domain = "macro"
+tier_policy = "STRICT"
+cadence_ms = 15000
+active = true
+outcomes = ["HIKE", "HOLD", "CUT"]
+description = "Fed next rate decision direction."
+tags = ["fed", "rates"]
+
+[[market]]
+market_id = "MACRO_US10Y_RANGE_30D"
+domain = "macro"
+tier_policy = "NORMAL"
+cadence_ms = 8000
+active = true
+outcomes = ["UP", "FLAT", "DOWN"]
+description = "US 10Y yield direction over 30 days."
+tags = ["rates", "bonds"]

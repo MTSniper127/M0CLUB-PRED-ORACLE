@@ -1,0 +1,77 @@
+
+# Anomaly rules are evaluated by the anomaly guardrails stage.
+# Each rule can produce WARN/DEGRADE/BLOCK actions.
+
+[defaults]
+cooldown_ms = 30000
+min_evidence_count = 3
+
+[[rule]]
+id = "staleness_guard"
+enabled = true
+action = "BLOCK"
+predicate = "observed_age_ms > max_staleness_ms"
+reason_code = "STALE_INPUTS"
+
+[[rule]]
+id = "coverage_guard"
+enabled = true
+action = "BLOCK"
+predicate = "source_coverage_ratio < min_source_coverage_ratio"
+reason_code = "LOW_COVERAGE"
+
+[[rule]]
+id = "ci_invalid_guard"
+enabled = true
+action = "BLOCK"
+predicate = "ci_low_scaled > p_scaled || p_scaled > ci_high_scaled || ci_low_scaled > ci_high_scaled"
+reason_code = "CI_INVALID"
+
+[[rule]]
+id = "ci_too_wide"
+enabled = true
+action = "DEGRADE"
+predicate = "ci_width_bps > max_ci_width_bps"
+reason_code = "CI_TOO_WIDE"
+
+[[rule]]
+id = "jump_exceeded"
+enabled = true
+action = "DEGRADE"
+predicate = "abs_jump_bps > max_jump_bps"
+reason_code = "JUMP_EXCEEDED"
+
+[[rule]]
+id = "divergence_spike"
+enabled = true
+action = "BLOCK"
+predicate = "divergence_score > 0.85 && source_count >= 3"
+reason_code = "HIGH_DIVERGENCE"
+
+[[rule]]
+id = "outlier_spike"
+enabled = true
+action = "DEGRADE"
+predicate = "outlier_score > 0.80"
+reason_code = "OUTLIER_SPIKE"
+
+[[rule]]
+id = "drift_detected"
+enabled = true
+action = "DEGRADE"
+predicate = "drift_score > 0.75"
+reason_code = "DRIFT_DETECTED"
+
+[[rule]]
+id = "rpc_unhealthy"
+enabled = true
+action = "DEGRADE"
+predicate = "rpc_error_rate > 0.10"
+reason_code = "RPC_UNHEALTHY"
+
+[[rule]]
+id = "signer_unavailable"
+enabled = true
+action = "BLOCK"
+predicate = "signer_threshold_met == false"
+reason_code = "SIGNER_UNAVAILABLE"
