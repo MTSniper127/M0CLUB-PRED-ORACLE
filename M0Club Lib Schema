@@ -1,0 +1,572 @@
+m0club/
+├─ README.md
+├─ LICENSE
+├─ SECURITY.md
+├─ CONTRIBUTING.md
+├─ CODE_OF_CONDUCT.md
+├─ CHANGELOG.md
+├─ .gitignore
+├─ .gitattributes
+├─ .editorconfig
+├─ rust-toolchain.toml
+├─ Cargo.toml
+├─ Cargo.lock
+├─ Makefile
+├─ justfile
+├─ .env.example
+├─ .github/
+│  ├─ workflows/
+│  │  ├─ ci.yml
+│  │  ├─ programs.yml
+│  │  ├─ engine.yml
+│  │  ├─ services.yml
+│  │  ├─ sdk.yml
+│  │  ├─ docker.yml
+│  │  ├─ security.yml
+│  │  └─ release.yml
+│  ├─ ISSUE_TEMPLATE/
+│  │  ├─ bug_report.md
+│  │  ├─ feature_request.md
+│  │  └─ config.yml
+│  └─ PULL_REQUEST_TEMPLATE.md
+├─ docs/
+│  ├─ overview.md
+│  ├─ architecture.md
+│  ├─ glossary.md
+│  ├─ design-decisions.md
+│  ├─ protocol-spec/
+│  │  ├─ oracle-output-format.md
+│  │  ├─ market-registry.md
+│  │  ├─ epoch-rounding.md
+│  │  ├─ commit-reveal.md
+│  │  ├─ signer-set.md
+│  │  ├─ aggregation.md
+│  │  ├─ dispute-resolution.md
+│  │  ├─ replay-protection.md
+│  │  └─ slashing.md
+│  ├─ engine-spec/
+│  │  ├─ m0-core.md
+│  │  ├─ data-ingestion.md
+│  │  ├─ normalization.md
+│  │  ├─ feature-store.md
+│  │  ├─ models-bayes.md
+│  │  ├─ calibration.md
+│  │  ├─ backtesting.md
+│  │  ├─ anomaly-guardrails.md
+│  │  ├─ confidence-intervals.md
+│  │  ├─ bundle-hashing.md
+│  │  └─ performance.md
+│  ├─ ops/
+│  │  ├─ local-dev.md
+│  │  ├─ deploy-k8s.md
+│  │  ├─ key-management.md
+│  │  ├─ incident-response.md
+│  │  ├─ signer-rotation.md
+│  │  ├─ migrations.md
+│  │  └─ runbooks.md
+│  └─ sdk/
+│     ├─ quickstart.md
+│     ├─ types.md
+│     ├─ examples.md
+│     └─ integration-guides.md
+├─ config/
+│  ├─ dev.toml
+│  ├─ staging.toml
+│  ├─ prod.toml
+│  ├─ markets/
+│  │  ├─ politics.toml
+│  │  ├─ sports.toml
+│  │  ├─ macro.toml
+│  │  └─ crypto.toml
+│  ├─ risk/
+│  │  ├─ thresholds.toml
+│  │  ├─ anomaly-rules.toml
+│  │  └─ slashing-params.toml
+│  └─ telemetry/
+│     ├─ otel.toml
+│     └─ prometheus.yml
+├─ scripts/
+│  ├─ bootstrap.sh
+│  ├─ localnet.sh
+│  ├─ build_all.sh
+│  ├─ test_all.sh
+│  ├─ lint_all.sh
+│  ├─ deploy_programs.sh
+│  ├─ seed_markets.sh
+│  ├─ smoke_test.sh
+│  ├─ gen_idl.sh
+│  ├─ publish_sdks.sh
+│  └─ release_tag.sh
+│
+├─ programs/
+│  ├─ m0-oracle/
+│  │  ├─ Anchor.toml
+│  │  ├─ Cargo.toml
+│  │  ├─ Xargo.toml
+│  │  ├─ src/
+│  │  │  ├─ lib.rs
+│  │  │  ├─ constants.rs
+│  │  │  ├─ error.rs
+│  │  │  ├─ events.rs
+│  │  │  ├─ state/
+│  │  │  │  ├─ mod.rs
+│  │  │  │  ├─ config.rs
+│  │  │  │  ├─ market.rs
+│  │  │  │  ├─ epoch.rs
+│  │  │  │  ├─ signer_set.rs
+│  │  │  │  ├─ commit.rs
+│  │  │  │  ├─ reveal.rs
+│  │  │  │  └─ audit.rs
+│  │  │  ├─ instructions/
+│  │  │  │  ├─ mod.rs
+│  │  │  │  ├─ init_protocol.rs
+│  │  │  │  ├─ create_market.rs
+│  │  │  │  ├─ update_market.rs
+│  │  │  │  ├─ open_epoch.rs
+│  │  │  │  ├─ commit_prediction.rs
+│  │  │  │  ├─ reveal_prediction.rs
+│  │  │  │  ├─ finalize_epoch.rs
+│  │  │  │  ├─ rotate_signer_set.rs
+│  │  │  │  ├─ pause_resume.rs
+│  │  │  │  └─ upgrade_admin.rs
+│  │  │  ├─ verify/
+│  │  │  │  ├─ mod.rs
+│  │  │  │  ├─ signature.rs
+│  │  │  │  ├─ merkle.rs
+│  │  │  │  └─ vrf.rs
+│  │  │  └─ utils/
+│  │  │     ├─ mod.rs
+│  │  │     ├─ hashing.rs
+│  │  │     ├─ serialization.rs
+│  │  │     └─ time.rs
+│  │  ├─ tests/
+│  │  │  ├─ oracle.spec.ts
+│  │  │  ├─ commit_reveal.spec.ts
+│  │  │  ├─ signer_rotation.spec.ts
+│  │  │  ├─ market_lifecycle.spec.ts
+│  │  │  └─ replay_protection.spec.ts
+│  │  └─ idl/
+│  │     └─ m0_oracle.json
+│  │
+│  ├─ m0-registry/
+│  │  ├─ Anchor.toml
+│  │  ├─ Cargo.toml
+│  │  └─ src/
+│  │     ├─ lib.rs
+│  │     ├─ error.rs
+│  │     ├─ events.rs
+│  │     ├─ state/
+│  │     │  ├─ mod.rs
+│  │     │  ├─ registry.rs
+│  │     │  └─ metadata.rs
+│  │     └─ instructions/
+│  │        ├─ mod.rs
+│  │        ├─ init_registry.rs
+│  │        ├─ upsert_market.rs
+│  │        └─ set_authority.rs
+│  │
+│  ├─ m0-fee-router/
+│  │  ├─ Anchor.toml
+│  │  ├─ Cargo.toml
+│  │  └─ src/
+│  │     ├─ lib.rs
+│  │     ├─ error.rs
+│  │     ├─ state/
+│  │     │  ├─ mod.rs
+│  │     │  ├─ router.rs
+│  │     │  └─ vaults.rs
+│  │     └─ instructions/
+│  │        ├─ mod.rs
+│  │        ├─ init_router.rs
+│  │        ├─ route_fees.rs
+│  │        └─ set_routes.rs
+│  │
+│  └─ m0-governance/
+│     ├─ Anchor.toml
+│     ├─ Cargo.toml
+│     └─ src/
+│        ├─ lib.rs
+│        ├─ error.rs
+│        ├─ state/
+│        │  ├─ mod.rs
+│        │  ├─ governor.rs
+│        │  └─ timelock.rs
+│        └─ instructions/
+│           ├─ mod.rs
+│           ├─ init_governor.rs
+│           ├─ propose.rs
+│           ├─ vote.rs
+│           ├─ execute.rs
+│           └─ set_guardians.rs
+│
+├─ core-engine/
+│  ├─ Cargo.toml
+│  ├─ crates/
+│  │  ├─ m0-common/
+│  │  │  ├─ src/
+│  │  │  │  ├─ lib.rs
+│  │  │  │  ├─ config.rs
+│  │  │  │  ├─ env.rs
+│  │  │  │  ├─ logging.rs
+│  │  │  │  ├─ telemetry.rs
+│  │  │  │  ├─ time.rs
+│  │  │  │  ├─ ids.rs
+│  │  │  │  ├─ hashing.rs
+│  │  │  │  ├─ serde_helpers.rs
+│  │  │  │  └─ error.rs
+│  │  │  └─ tests/
+│  │  ├─ m0-ingestor/
+│  │  │  ├─ src/
+│  │  │  │  ├─ lib.rs
+│  │  │  │  ├─ connectors/
+│  │  │  │  │  ├─ mod.rs
+│  │  │  │  │  ├─ solana.rs
+│  │  │  │  │  ├─ sports.rs
+│  │  │  │  │  ├─ politics.rs
+│  │  │  │  │  ├─ macro.rs
+│  │  │  │  │  └─ webhooks.rs
+│  │  │  │  ├─ stream/
+│  │  │  │  │  ├─ mod.rs
+│  │  │  │  │  ├─ producer.rs
+│  │  │  │  │  ├─ consumer.rs
+│  │  │  │  │  ├─ schema.rs
+│  │  │  │  │  └─ offsets.rs
+│  │  │  │  ├─ dedupe.rs
+│  │  │  │  ├─ rate_limit.rs
+│  │  │  │  ├─ retries.rs
+│  │  │  │  └─ error.rs
+│  │  │  └─ tests/
+│  │  ├─ m0-normalizer/
+│  │  │  ├─ src/
+│  │  │  │  ├─ lib.rs
+│  │  │  │  ├─ rules/
+│  │  │  │  │  ├─ mod.rs
+│  │  │  │  │  ├─ canonicalize.rs
+│  │  │  │  │  ├─ validation.rs
+│  │  │  │  │  └─ enrichment.rs
+│  │  │  │  ├─ schema/
+│  │  │  │  │  ├─ mod.rs
+│  │  │  │  │  ├─ raw.rs
+│  │  │  │  │  └─ canonical.rs
+│  │  │  │  └─ error.rs
+│  │  ├─ m0-feature-store/
+│  │  │  ├─ src/
+│  │  │  │  ├─ lib.rs
+│  │  │  │  ├─ transforms/
+│  │  │  │  │  ├─ mod.rs
+│  │  │  │  │  ├─ time_window.rs
+│  │  │  │  │  ├─ rolling_stats.rs
+│  │  │  │  │  ├─ embeddings.rs
+│  │  │  │  │  └─ domain_features.rs
+│  │  │  │  ├─ storage/
+│  │  │  │  │  ├─ mod.rs
+│  │  │  │  │  ├─ postgres.rs
+│  │  │  │  │  ├─ clickhouse.rs
+│  │  │  │  │  ├─ rocksdb.rs
+│  │  │  │  │  └─ migrations/
+│  │  │  │  ├─ schema/
+│  │  │  │  │  ├─ mod.rs
+│  │  │  │  │  └─ feature.proto
+│  │  │  │  └─ error.rs
+│  │  ├─ m0-quant/
+│  │  │  ├─ src/
+│  │  │  │  ├─ lib.rs
+│  │  │  │  ├─ bayes/
+│  │  │  │  │  ├─ mod.rs
+│  │  │  │  │  ├─ priors.rs
+│  │  │  │  │  ├─ posteriors.rs
+│  │  │  │  │  └─ inference.rs
+│  │  │  │  ├─ models/
+│  │  │  │  │  ├─ mod.rs
+│  │  │  │  │  ├─ elo.rs
+│  │  │  │  │  ├─ poisson.rs
+│  │  │  │  │  ├─ garch.rs
+│  │  │  │  │  ├─ hidden_markov.rs
+│  │  │  │  │  └─ ensemble.rs
+│  │  │  │  ├─ calibration/
+│  │  │  │  │  ├─ mod.rs
+│  │  │  │  │  ├─ isotonic.rs
+│  │  │  │  │  └─ temperature.rs
+│  │  │  │  ├─ confidence/
+│  │  │  │  │  ├─ mod.rs
+│  │  │  │  │  ├─ ci.rs
+│  │  │  │  │  └─ uncertainty.rs
+│  │  │  │  ├─ risk/
+│  │  │  │  │  ├─ mod.rs
+│  │  │  │  │  ├─ var.rs
+│  │  │  │  │  ├─ cvar.rs
+│  │  │  │  │  └─ stress.rs
+│  │  │  │  ├─ scoring/
+│  │  │  │  │  ├─ mod.rs
+│  │  │  │  │  ├─ brier.rs
+│  │  │  │  │  └─ logloss.rs
+│  │  │  │  └─ utils/
+│  │  │  │     ├─ mod.rs
+│  │  │  │     ├─ linalg.rs
+│  │  │  │     └─ stats.rs
+│  │  │  │  └─ tests/
+│  │  ├─ m0-anomaly/
+│  │  │  ├─ src/
+│  │  │  │  ├─ lib.rs
+│  │  │  │  ├─ detectors/
+│  │  │  │  │  ├─ mod.rs
+│  │  │  │  │  ├─ drift.rs
+│  │  │  │  │  ├─ outlier.rs
+│  │  │  │  │  └─ feed_integrity.rs
+│  │  │  │  ├─ guardrails.rs
+│  │  │  │  └─ error.rs
+│  │  ├─ m0-backtest/
+│  │  │  ├─ src/
+│  │  │  │  ├─ lib.rs
+│  │  │  │  ├─ dataset.rs
+│  │  │  │  ├─ runner.rs
+│  │  │  │  ├─ reports.rs
+│  │  │  │  └─ metrics.rs
+│  │  ├─ m0-bundle/
+│  │  │  ├─ src/
+│  │  │  │  ├─ lib.rs
+│  │  │  │  ├─ format.rs
+│  │  │  │  ├─ hashing.rs
+│  │  │  │  ├─ merkle.rs
+│  │  │  │  └─ codec.rs
+│  │  ├─ m0-signer/
+│  │  │  ├─ src/
+│  │  │  │  ├─ lib.rs
+│  │  │  │  ├─ keyring/
+│  │  │  │  │  ├─ mod.rs
+│  │  │  │  │  ├─ local.rs
+│  │  │  │  │  ├─ kms.rs
+│  │  │  │  │  └─ rotation.rs
+│  │  │  │  ├─ commit.rs
+│  │  │  │  ├─ reveal.rs
+│  │  │  │  ├─ tx_submit.rs
+│  │  │  │  ├─ replay_protection.rs
+│  │  │  │  └─ error.rs
+│  │  ├─ m0-core/
+│  │  │  ├─ src/
+│  │  │  │  ├─ lib.rs
+│  │  │  │  ├─ pipeline/
+│  │  │  │  │  ├─ mod.rs
+│  │  │  │  │  ├─ ingest.rs
+│  │  │  │  │  ├─ normalize.rs
+│  │  │  │  │  ├─ feature.rs
+│  │  │  │  │  ├─ model.rs
+│  │  │  │  │  ├─ calibrate.rs
+│  │  │  │  │  ├─ backtest.rs
+│  │  │  │  │  ├─ bundle.rs
+│  │  │  │  │  └─ health.rs
+│  │  │  │  ├─ runtime/
+│  │  │  │  │  ├─ mod.rs
+│  │  │  │  │  ├─ scheduler.rs
+│  │  │  │  │  ├─ worker.rs
+│  │  │  │  │  ├─ checkpoint.rs
+│  │  │  │  │  └─ metrics.rs
+│  │  │  │  ├─ types/
+│  │  │  │  │  ├─ mod.rs
+│  │  │  │  │  ├─ market.rs
+│  │  │  │  │  ├─ event.rs
+│  │  │  │  │  ├─ features.rs
+│  │  │  │  │  ├─ distribution.rs
+│  │  │  │  │  ├─ confidence.rs
+│  │  │  │  │  └─ bundle.rs
+│  │  │  │  └─ error.rs
+│  │  │  └─ benches/
+│  ├─ bin/
+│  │  ├─ m0d/
+│  │  │  └─ main.rs
+│  │  ├─ m0-ingestd/
+│  │  │  └─ main.rs
+│  │  ├─ m0-backtestd/
+│  │  │  └─ main.rs
+│  │  └─ m0-signer-agent/
+│  │     └─ main.rs
+│  └─ testdata/
+│     ├─ fixtures/
+│     ├─ sports/
+│     ├─ politics/
+│     └─ macro/
+│
+├─ services/
+│  ├─ api-gateway/
+│  │  ├─ Cargo.toml
+│  │  ├─ src/
+│  │  │  ├─ main.rs
+│  │  │  ├─ routes/
+│  │  │  │  ├─ mod.rs
+│  │  │  │  ├─ health.rs
+│  │  │  │  ├─ markets.rs
+│  │  │  │  ├─ epochs.rs
+│  │  │  │  ├─ predictions.rs
+│  │  │  │  └─ metrics.rs
+│  │  │  ├─ openapi/
+│  │  │  │  └─ spec.rs
+│  │  │  ├─ auth/
+│  │  │  │  ├─ mod.rs
+│  │  │  │  ├─ api_keys.rs
+│  │  │  │  └─ jwt.rs
+│  │  │  ├─ cache/
+│  │  │  │  ├─ mod.rs
+│  │  │  │  ├─ redis.rs
+│  │  │  │  └─ ttl.rs
+│  │  │  ├─ db/
+│  │  │  │  ├─ mod.rs
+│  │  │  │  ├─ postgres.rs
+│  │  │  │  └─ migrations/
+│  │  │  ├─ middleware/
+│  │  │  │  ├─ mod.rs
+│  │  │  │  ├─ rate_limit.rs
+│  │  │  │  ├─ tracing.rs
+│  │  │  │  └─ request_id.rs
+│  │  │  └─ error.rs
+│  │  └─ Dockerfile
+│  │
+│  ├─ indexer/
+│  │  ├─ Cargo.toml
+│  │  ├─ src/
+│  │  │  ├─ main.rs
+│  │  │  ├─ program_subscriber.rs
+│  │  │  ├─ parser/
+│  │  │  │  ├─ mod.rs
+│  │  │  │  ├─ m0_oracle.rs
+│  │  │  │  └─ m0_registry.rs
+│  │  │  ├─ storage/
+│  │  │  │  ├─ mod.rs
+│  │  │  │  ├─ postgres.rs
+│  │  │  │  ├─ clickhouse.rs
+│  │  │  │  └─ migrations/
+│  │  │  ├─ reorg_handling.rs
+│  │  │  └─ error.rs
+│  │  └─ Dockerfile
+│  │
+│  ├─ realtime/
+│  │  ├─ Cargo.toml
+│  │  ├─ src/
+│  │  │  ├─ main.rs
+│  │  │  ├─ ws.rs
+│  │  │  ├─ pubsub.rs
+│  │  │  └─ throttling.rs
+│  │  └─ Dockerfile
+│  │
+│  ├─ dashboard/
+│  │  ├─ package.json
+│  │  ├─ tsconfig.json
+│  │  ├─ next.config.js
+│  │  ├─ public/
+│  │  ├─ src/
+│  │  │  ├─ app/
+│  │  │  ├─ components/
+│  │  │  ├─ lib/
+│  │  │  └─ pages/
+│  │  └─ Dockerfile
+│  │
+│  └─ jobs/
+│     ├─ Cargo.toml
+│     ├─ src/
+│     │  ├─ main.rs
+│     │  ├─ tasks/
+│     │  │  ├─ backfill.rs
+│     │  │  ├─ recompute.rs
+│     │  │  ├─ reconcile.rs
+│     │  │  └─ cleanup.rs
+│     │  └─ scheduler.rs
+│     └─ Dockerfile
+│
+├─ sdk/
+│  ├─ types/
+│  │  ├─ m0_types.json
+│  │  ├─ m0_types.ts
+│  │  ├─ m0_types.rs
+│  │  └─ m0_types.py
+│  │
+│  ├─ ts/
+│  │  ├─ package.json
+│  │  ├─ tsconfig.json
+│  │  ├─ src/
+│  │  │  ├─ index.ts
+│  │  │  ├─ client.ts
+│  │  │  ├─ programs/
+│  │  │  │  ├─ m0_oracle.ts
+│  │  │  │  ├─ m0_registry.ts
+│  │  │  │  └─ idl/
+│  │  │  ├─ types/
+│  │  │  ├─ utils/
+│  │  │  └─ examples/
+│  │  └─ tests/
+│  │
+│  ├─ rust/
+│  │  ├─ Cargo.toml
+│  │  └─ src/
+│  │     ├─ lib.rs
+│  │     ├─ client.rs
+│  │     ├─ programs/
+│  │     ├─ types/
+│  │     ├─ utils/
+│  │     └─ examples/
+│  │
+│  └─ python/
+│     ├─ pyproject.toml
+│     ├─ m0club/
+│     │  ├─ __init__.py
+│     │  ├─ client.py
+│     │  ├─ programs/
+│     │  ├─ types/
+│     │  ├─ utils/
+│     │  └─ examples/
+│     └─ tests/
+│
+├─ infra/
+│  ├─ docker/
+│  │  ├─ compose.dev.yml
+│  │  ├─ compose.staging.yml
+│  │  ├─ compose.prod.yml
+│  │  ├─ images/
+│  │  │  ├─ engine.Dockerfile
+│  │  │  ├─ signer.Dockerfile
+│  │  │  ├─ api.Dockerfile
+│  │  │  ├─ indexer.Dockerfile
+│  │  │  └─ dashboard.Dockerfile
+│  │  └─ entrypoints/
+│  ├─ k8s/
+│  │  ├─ namespaces/
+│  │  ├─ helm/
+│  │  │  ├─ m0club/
+│  │  │  │  ├─ Chart.yaml
+│  │  │  │  ├─ values.yaml
+│  │  │  │  └─ templates/
+│  │  │  └─ dependencies/
+│  │  ├─ manifests/
+│  │  │  ├─ engine.yaml
+│  │  │  ├─ signer.yaml
+│  │  │  ├─ api.yaml
+│  │  │  ├─ indexer.yaml
+│  │  │  ├─ realtime.yaml
+│  │  │  ├─ jobs.yaml
+│  │  │  └─ ingress.yaml
+│  │  ├─ secrets/
+│  │  └─ configmaps/
+│  ├─ terraform/
+│  │  ├─ modules/
+│  │  ├─ envs/
+│  │  │  ├─ dev/
+│  │  │  ├─ staging/
+│  │  │  └─ prod/
+│  │  └─ main.tf
+│  └─ monitoring/
+│     ├─ grafana/
+│     ├─ prometheus/
+│     ├─ loki/
+│     └─ alerts/
+│
+└─ tests/
+   ├─ integration/
+   │  ├─ e2e_oracle_flow.spec.ts
+   │  ├─ e2e_commit_reveal.spec.ts
+   │  ├─ e2e_reorg_resilience.spec.ts
+   │  └─ fixtures/
+   ├─ load/
+   │  ├─ k6/
+   │  ├─ scenarios/
+   │  └─ results/
+   └─ fuzz/
+      ├─ programs/
+      └─ engine/
