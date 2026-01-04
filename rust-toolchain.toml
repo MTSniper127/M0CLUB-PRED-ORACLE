@@ -1,0 +1,79 @@
+
+# rust-toolchain.toml
+#
+# This repository uses a pinned Rust toolchain for reproducible builds across:
+# - core engine (Rust)
+# - services (Rust)
+# - SDK (Rust)
+# - CI pipelines (GitHub Actions)
+#
+# IMPORTANT:
+# - Solana/Anchor program builds typically rely on the Solana toolchain distributed by Solana/Anchor
+#   (including a specific rustc + LLVM toolchain for BPF/SBF). This file pins the *host* toolchain used
+#   for off-chain components and tooling (clippy/rustfmt/cargo).
+# - If you build Anchor programs, install Solana + Anchor as documented by those projects. Your program
+#   builds will still work because Anchor uses the Solana toolchain for SBF compilation.
+#
+# To check the active toolchain:
+#   rustc --version
+#   cargo --version
+#
+# To install exactly what this file requests:
+#   rustup show
+#   rustup toolchain install 1.78.0 --profile minimal --component rustfmt --component clippy
+#
+# For contributors:
+# - Keep this file in sync with CI (see .github/workflows/*).
+# - Prefer stable pins for production and only use nightly for dedicated fuzzing/profiling tasks.
+#
+# =============================================================================
+
+[toolchain]
+# Pin to a specific stable release for deterministic compilation.
+# If you bump this, bump CI caches and verify all crates compile (engine + services + sdk).
+channel = "1.78.0"
+
+# The minimal profile avoids downloading docs and extra components by default.
+# You can switch to "default" if you want docs/std sources installed automatically.
+profile = "minimal"
+
+# Common components used by developers and CI.
+# - rustfmt: formatting
+# - clippy: linting
+# - rust-src: required by some IDEs and by certain cross-compilation workflows
+# - llvm-tools-preview: enables coverage/profiling tools (llvm-cov, etc.)
+components = [
+  "rustfmt",
+  "clippy",
+  "rust-src",
+  "llvm-tools-preview"
+]
+
+# Cross compilation targets used across the repo:
+# - x86_64-unknown-linux-gnu: CI + common servers
+# - aarch64-unknown-linux-gnu: ARM servers (Graviton, etc.)
+# - x86_64-apple-darwin / aarch64-apple-darwin: macOS developer machines
+# - wasm32-unknown-unknown: optional (dashboard tooling / future wasm clients)
+#
+# NOTE: Solana SBF target is handled by Solana toolchain, not rustup targets.
+targets = [
+  "x86_64-unknown-linux-gnu",
+  "aarch64-unknown-linux-gnu",
+  "x86_64-apple-darwin",
+  "aarch64-apple-darwin",
+  "wasm32-unknown-unknown"
+]
+
+# =============================================================================
+# Optional: Per-directory overrides
+#
+# If you want nightly for fuzzing, do NOT change the global pin above.
+# Instead, place a rust-toolchain.toml inside the fuzz directory.
+#
+# Example (already scaffolded in tests/fuzz/programs/rust-toolchain.toml):
+#
+#   [toolchain]
+#   channel = "nightly"
+#   components = ["llvm-tools-preview"]
+#
+# =============================================================================
