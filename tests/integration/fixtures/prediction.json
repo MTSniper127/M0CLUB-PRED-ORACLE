@@ -1,0 +1,9 @@
+
+{
+  "market_id": "SPORTS_NBA_LAL_BOS",
+  "epoch_id": 1,
+  "outcomes": {
+    "LAL": { "p": 0.51, "ci": [0.48, 0.54] },
+    "BOS": { "p": 0.49, "ci": [0.46, 0.52] }
+  }
+}

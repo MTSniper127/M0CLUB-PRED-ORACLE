@@ -1,0 +1,5 @@
+
+[
+  { "market_id": "SPORTS_NBA_LAL_BOS", "domain": "sports", "status": "active" },
+  { "market_id": "POLITICS_US_PRES_2028", "domain": "politics", "status": "active" }
+]

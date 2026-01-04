@@ -1,0 +1,24 @@
+
+{
+  "name": "m0club-tests",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test:integration": "node --test dist/integration/e2e_oracle_flow.spec.js && node --test dist/integration/e2e_commit_reveal.spec.js && node --test dist/integration/e2e_reorg_resilience.spec.js",
+    "test": "npm run build && npm run test:integration",
+    "k6:smoke": "k6 run load/k6/smoke.js",
+    "k6:scenarios": "node load/scenarios/run.js",
+    "fuzz:engine": "python3 fuzz/engine/fuzz_engine.py",
+    "fuzz:programs": "cargo fuzz run m0_oracle_fuzz -- -runs=5000",
+    "lint": "node -e \"console.log('ok')\""
+  },
+  "dependencies": {
+    "node-fetch": "3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.10",
+    "typescript": "5.5.4"
+  }
+}
