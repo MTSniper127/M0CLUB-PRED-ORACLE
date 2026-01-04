@@ -1,0 +1,337 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version tag (e.g. v1.2.3). If empty, uses current ref/tag."
+        type: string
+        default: ""
+      prerelease:
+        description: "Mark as prerelease"
+        type: boolean
+        default: false
+      publish_docker:
+        description: "Publish Docker images (GHCR) if Dockerfiles exist"
+        type: boolean
+        default: true
+      publish_npm:
+        description: "Publish TypeScript SDK to npm (requires NPM_TOKEN)"
+        type: boolean
+        default: false
+      publish_pypi:
+        description: "Publish Python SDK to PyPI (requires PYPI_API_TOKEN)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+  NODE_VERSION: "20"
+  PYTHON_VERSION: "3.12"
+  SOLANA_VERSION: "v1.18.26"
+  ANCHOR_VERSION: "0.30.1"
+
+jobs:
+  prepare:
+    name: Prepare release metadata
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+      version: ${{ steps.meta.outputs.version }}
+      prerelease: ${{ steps.meta.outputs.prerelease }}
+    steps:
+      - name: Determine tag/version
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          input_version="${{ github.event.inputs.version || '' }}"
+          if [ -n "$input_version" ]; then
+            tag="$input_version"
+          else
+            tag="${GITHUB_REF#refs/tags/}"
+            if [ "$tag" = "$GITHUB_REF" ]; then
+              # Not a tag ref (workflow_dispatch on a branch)
+              # In that case, require a version input.
+              echo "version input is required when not running on a tag ref"
+              exit 1
+            fi
+          fi
+
+          if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+.*$ ]]; then
+            echo "Tag must look like vX.Y.Z (got: $tag)"
+            exit 1
+          fi
+
+          version="${tag#v}"
+          prerelease="${{ github.event.inputs.prerelease || 'false' }}"
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+
+          echo "Release tag: $tag"
+          echo "Version: $version"
+          echo "Prerelease: $prerelease"
+
+  build:
+    name: Build artifacts
+    runs-on: ubuntu-latest
+    needs: prepare
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install OS deps
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential pkg-config libssl-dev libudev-dev \
+            curl ca-certificates git jq zip unzip
+          sudo rm -rf /var/lib/apt/lists/*
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            . -> target
+
+      - name: Build workspace (release)
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo build --workspace --release
+
+      - name: Collect Rust binaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist/bin
+          # Add/rename as your repo defines binaries
+          for b in m0d m0-ingestd m0-backtestd m0-signer-agent api-gateway indexer realtime jobs; do
+            if [ -f "target/release/$b" ]; then
+              cp "target/release/$b" "dist/bin/$b"
+            fi
+          done
+          ls -la dist/bin || true
+
+      - name: Package binaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist/packages
+          if [ -d dist/bin ] && [ "$(ls -A dist/bin 2>/dev/null | wc -l)" -gt 0 ]; then
+            tar -czf "dist/packages/m0club-${{ needs.prepare.outputs.tag }}-linux-amd64.tar.gz" -C dist/bin .
+            sha256sum "dist/packages/m0club-${{ needs.prepare.outputs.tag }}-linux-amd64.tar.gz" > "dist/packages/m0club-${{ needs.prepare.outputs.tag }}-linux-amd64.tar.gz.sha256"
+          else
+            echo "No binaries found to package."
+          fi
+          ls -la dist/packages || true
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-dist
+          path: dist
+          retention-days: 14
+
+  docker:
+    name: Build & publish Docker images (GHCR)
+    runs-on: ubuntu-latest
+    needs: prepare
+    if: ${{ github.event.inputs.publish_docker != 'false' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect Dockerfiles
+        id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -d "infra/docker/images" ] && ls infra/docker/images/*.Dockerfile >/dev/null 2>&1; then
+            echo "has=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Docker Buildx
+        if: ${{ steps.detect.outputs.has == 'true' }}
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        if: ${{ steps.detect.outputs.has == 'true' }}
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push all images
+        if: ${{ steps.detect.outputs.has == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${{ needs.prepare.outputs.tag }}"
+          OWNER="${{ github.repository_owner }}"
+          for f in infra/docker/images/*.Dockerfile; do
+            name="$(basename "$f" | sed 's/\.Dockerfile$//' )"
+            image="ghcr.io/${OWNER}/m0club-${name}:${TAG}"
+            image_latest="ghcr.io/${OWNER}/m0club-${name}:latest"
+
+            echo "Building $f -> $image"
+            docker buildx build \
+              -f "$f" \
+              -t "$image" \
+              -t "$image_latest" \
+              --build-arg SOLANA_VERSION="${{ env.SOLANA_VERSION }}" \
+              --build-arg ANCHOR_VERSION="${{ env.ANCHOR_VERSION }}" \
+              --build-arg NODE_VERSION="${{ env.NODE_VERSION }}" \
+              --build-arg PYTHON_VERSION="${{ env.PYTHON_VERSION }}" \
+              --cache-from type=gha \
+              --cache-to type=gha,mode=max \
+              --push \
+              .
+          done
+
+  github-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [prepare, build]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-dist
+          path: dist
+
+      - name: Generate release notes (best-effort)
+        id: notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "# ${{ needs.prepare.outputs.tag }}"
+            echo
+            echo "## Summary"
+            echo "- Automated release build for M0Club"
+            echo
+            echo "## Artifacts"
+            if [ -d dist/packages ]; then
+              ls -1 dist/packages || true
+            fi
+          } > RELEASE_NOTES.md
+          echo "notes=RELEASE_NOTES.md" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.prepare.outputs.tag }}
+          name: ${{ needs.prepare.outputs.tag }}
+          prerelease: ${{ needs.prepare.outputs.prerelease == 'true' }}
+          body_path: ${{ steps.notes.outputs.notes }}
+          files: |
+            dist/packages/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-npm:
+    name: Publish TypeScript SDK (npm)
+    runs-on: ubuntu-latest
+    needs: prepare
+    if: ${{ github.event.inputs.publish_npm == true }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+          cache-dependency-path: sdk/ts/package-lock.json
+
+      - name: Install & build
+        working-directory: sdk/ts
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          if npm run | grep -qE '^  build'; then
+            npm run build
+          fi
+
+      - name: Set version (optional)
+        working-directory: sdk/ts
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Keep semver aligned: vX.Y.Z tag -> X.Y.Z
+          npm version "${{ needs.prepare.outputs.version }}" --no-git-tag-version
+
+      - name: Publish
+        working-directory: sdk/ts
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-pypi:
+    name: Publish Python SDK (PyPI)
+    runs-on: ubuntu-latest
+    needs: prepare
+    if: ${{ github.event.inputs.publish_pypi == true }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: sdk/python/pyproject.toml
+
+      - name: Build
+        working-directory: sdk/python
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install build twine
+          python -m build
+
+      - name: Publish
+        working-directory: sdk/python
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m twine upload dist/*
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
